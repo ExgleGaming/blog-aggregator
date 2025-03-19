@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/exglegaming/blog-aggregator/internal/config"
 	"github.com/exglegaming/blog-aggregator/internal/database"
 	_ "github.com/lib/pq"
@@ -16,44 +15,41 @@ type State struct {
 }
 
 func main() {
-
-	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
-	if err != nil {
-		log.Fatalf("Error opening database connection: %v", err)
-	}
-	dbQueries := database.New(db)
-
-	c, err := config.Read()
+	cfg, err := config.Read()
 	if err != nil {
 		log.Fatalf("Error reading config: %v", err)
 	}
 
-	state := State{
+	db, err := sql.Open("postgres", cfg.DbURL)
+	if err != nil {
+		log.Fatalf("Error opening database connection: %v", err)
+	}
+	defer db.Close()
+	dbQueries := database.New(db)
+
+	state := &State{
 		db:  dbQueries,
-		cfg: &c,
+		cfg: &cfg,
 	}
 
 	commands := Commands{
 		handlers: make(map[string]func(*State, Command) error),
 	}
 	commands.register("login", handlerLogin)
+	commands.register("register", handlerRegister)
+	commands.register("reset", handlerReset)
+	commands.register("users", handlerGetUsers)
 
-	args := os.Args
-	if len(args) < 2 {
-		fmt.Fprintln(os.Stderr, "Error: not enough arguments. Please provide a command.")
-		os.Exit(1)
+	if len(os.Args) < 2 {
+		log.Fatal("Usage: cli <command> [args...]")
+		return
 	}
 
-	cmdName := args[1]
-	cmdArgs := args[2:]
+	cmdName := os.Args[1]
+	cmdArgs := os.Args[2:]
 
-	cmd := Command{
-		name: cmdName,
-		args: cmdArgs,
-	}
-
-	err = commands.run(&state, cmd)
+	err = commands.run(state, Command{name: cmdName, args: cmdArgs})
 	if err != nil {
-		log.Fatalf("Error executing command: %v", err)
+		log.Fatal(err)
 	}
 }
