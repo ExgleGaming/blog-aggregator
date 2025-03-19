@@ -21,14 +21,9 @@ func (c *Commands) register(name string, f func(*State, Command) error) {
 }
 
 func (c *Commands) run(s *State, cmd Command) error {
-	command, exists := c.handlers[cmd.name]
-	if !exists {
+	f, ok := c.handlers[cmd.name]
+	if !ok {
 		return errors.New("command not found")
 	}
-
-	err := command(s, cmd)
-	if err != nil {
-		return err
-	}
-	return nil
+	return f(s, cmd)
 }
