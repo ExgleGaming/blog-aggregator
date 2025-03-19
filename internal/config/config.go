@@ -13,7 +13,7 @@ type Config struct {
 
 const configFileName = ".gatorconfig.json"
 
-// Retrieves the config file path and returns it. If not at loction it will create it for you.
+// getConfigFilePath Retrieves the config file path and returns it. If not at location it will create it for you.
 func getConfigFilePath() (string, error) {
 	dir, err := os.UserHomeDir()
 	if err != nil {
@@ -22,13 +22,13 @@ func getConfigFilePath() (string, error) {
 	return filepath.Join(dir, configFileName), nil
 }
 
-// This set the username and write it to the config
+// SetUser This set the username and write it to the config
 func (c *Config) SetUser(username string) error {
 	c.CurrentUserName = username
 	return Write(*c)
 }
 
-// This is the function called to write to the config file
+// Write This is the function called to write to the config file
 func Write(cfg Config) error {
 	path, err := getConfigFilePath()
 	if err != nil {
@@ -47,7 +47,7 @@ func Write(cfg Config) error {
 	return nil
 }
 
-// This is to read the config file and return it in usable format
+// Read This is to read the config file and return it in usable format
 func Read() (Config, error) {
 	path, err := getConfigFilePath()
 	if err != nil {
