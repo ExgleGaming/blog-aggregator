@@ -6,6 +6,7 @@ import (
 	"html"
 	"io"
 	"net/http"
+	"time"
 )
 
 type RSSFeed struct {
@@ -25,37 +26,39 @@ type RSSItem struct {
 }
 
 func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
+	httpClient := http.Client{
+		Timeout: 10 * time.Second,
+	}
 	req, err := http.NewRequestWithContext(ctx, "GET", feedURL, nil)
 	if err != nil {
-		return &RSSFeed{}, err
+		return nil, err
 	}
 
 	req.Header.Set("User-Agent", "gator")
-	client := &http.Client{}
-	res, err := client.Do(req)
+	resp, err := httpClient.Do(req)
 	if err != nil {
-		return &RSSFeed{}, err
+		return nil, err
 	}
-	defer res.Body.Close()
+	defer resp.Body.Close()
 
-	data, err := io.ReadAll(res.Body)
+	dat, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return &RSSFeed{}, err
+		return nil, err
 	}
 
-	var feed RSSFeed
-	err = xml.Unmarshal(data, &feed)
+	var rssFeed RSSFeed
+	err = xml.Unmarshal(dat, &rssFeed)
 	if err != nil {
-		return &RSSFeed{}, err
+		return nil, err
 	}
 
-	feed.Channel.Title = html.UnescapeString(feed.Channel.Title)
-	feed.Channel.Description = html.UnescapeString(feed.Channel.Description)
-
-	for i, val := range feed.Channel.Item {
-		feed.Channel.Item[i].Title = html.UnescapeString(val.Title)
-		feed.Channel.Item[i].Description = html.UnescapeString(val.Description)
+	rssFeed.Channel.Title = html.UnescapeString(rssFeed.Channel.Title)
+	rssFeed.Channel.Description = html.UnescapeString(rssFeed.Channel.Description)
+	for i, item := range rssFeed.Channel.Item {
+		item.Title = html.UnescapeString(item.Title)
+		item.Description = html.UnescapeString(item.Description)
+		rssFeed.Channel.Item[i] = item
 	}
 
-	return &feed, nil
+	return &rssFeed, nil
 }

@@ -1,27 +1,22 @@
 package main
 
-import (
-	"errors"
-)
+import "errors"
 
-type Command struct {
-	name string
-	args []string
+type command struct {
+	Name string
+	Args []string
 }
 
-type Commands struct {
-	handlers map[string]func(*State, Command) error
+type commands struct {
+	registeredCommands map[string]func(*state, command) error
 }
 
-func (c *Commands) register(name string, f func(*State, Command) error) {
-	if c.handlers == nil {
-		c.handlers = make(map[string]func(*State, Command) error)
-	}
-	c.handlers[name] = f
+func (c *commands) register(name string, f func(*state, command) error) {
+	c.registeredCommands[name] = f
 }
 
-func (c *Commands) run(s *State, cmd Command) error {
-	f, ok := c.handlers[cmd.name]
+func (c *commands) run(s *state, cmd command) error {
+	f, ok := c.registeredCommands[cmd.Name]
 	if !ok {
 		return errors.New("command not found")
 	}
