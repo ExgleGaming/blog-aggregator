@@ -27,31 +27,31 @@ Replace the values with your database connection string.
 Create a new user:
 
 ```bash
-gator register <name>
+blog-aggregator register <name>
 ```
 
 Add a feed:
 
 ```bash
-gator addfeed <url>
+blog-aggregator addfeed <url>
 ```
 
 Start the aggregator:
 
 ```bash
-gator agg 30s
+blog-aggregator agg 30s
 ```
 
 View the posts:
 
 ```bash
-gator browse [limit]
+blog-aggregator browse [limit]
 ```
 
 There are a few other commands you'll need as well:
 
-- `gator login <name>` - Log in as a user that already exists
-- `gator users` - List all users
-- `gator feeds` - List all feeds
-- `gator follow <url>` - Follow a feed that already exists in the database
-- `gator unfollow <url>` - Unfollow a feed that already exists in the database
+- `blog-aggregator login <name>` - Log in as a user that already exists
+- `blog-aggregator users` - List all users
+- `blog-aggregator feeds` - List all feeds
+- `blog-aggregator follow <url>` - Follow a feed that already exists in the database
+- `blog-aggregator unfollow <url>` - Unfollow a feed that already exists in the database
