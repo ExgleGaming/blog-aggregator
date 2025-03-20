@@ -10,8 +10,6 @@ func handlerAgg(s *State, cmd Command) error {
 	if err != nil {
 		return err
 	}
-
 	fmt.Printf("%#v\n", feed)
-
 	return nil
 }
