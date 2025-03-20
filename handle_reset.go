@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// Resets the database
 func handlerReset(s *State, cmd Command) error {
 	err := s.db.DeleteUsers(context.Background())
 	if err != nil {

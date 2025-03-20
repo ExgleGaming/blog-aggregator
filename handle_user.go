@@ -64,6 +64,7 @@ func handlerLogin(s *State, cmd Command) error {
 	return nil
 }
 
+// Prints all users that are in the database
 func handlerGetUsers(s *State, cmd Command) error {
 	users, err := s.db.GetUsers(context.Background())
 	if err != nil {
